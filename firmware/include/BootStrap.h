@@ -8,8 +8,8 @@
 2. 해당 클래스를 봤을 때, 초기화 순서를 짐작할 수 있어야 합니다.
 3. 상수 변수가 아닌 모든 변수를 초기화 합니다.*/
 
-extern QueueHandle_t PowerEventQueue;
-extern QueueHandle_t CanEventQueue;
+// extern QueueHandle_t PowerEventQueue;
+// extern QueueHandle_t CanEventQueue;
 
 class BootStrap
 {

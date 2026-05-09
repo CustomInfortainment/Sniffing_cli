@@ -7,7 +7,6 @@
 class SerialWorker:CThread
 {
     private:
-
     public:
         void SendCommand(char* cmd);
         void RecvCommand();

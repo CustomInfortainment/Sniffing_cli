@@ -4,9 +4,9 @@ HardwareSerial SBCSerial(2);                    //2번 채널 사용
 
 void BootStrap::Init()
 {
-    InitEventQueue();
-    InitPinMode();
-    InitTask();
+    //InitEventQueue();
+    //InitPinMode();
+    //InitTask();
     InitSerial();
 }
 
@@ -26,11 +26,11 @@ void BootStrap::InitTask()
 
 void BootStrap::InitEventQueue()
 {
-    PowerEventQueue = xQueueCreate(8, sizeof(uint32_t));
-    CanEventQueue = xQueueCreate(8, sizeof(uint32_t));
+    // PowerEventQueue = xQueueCreate(8, sizeof(uint32_t));
+    // CanEventQueue = xQueueCreate(8, sizeof(uint32_t));
 
-    if(PowerEventQueue != NULL) Serial.println("전원 이벤트 큐 생성 완료...");
-    if(CanEventQueue != NULL) Serial.println("CAN 통신 이벤트 큐 생성 완료...");
+    // if(PowerEventQueue != NULL) Serial.println("전원 이벤트 큐 생성 완료...");
+    // if(CanEventQueue != NULL) Serial.println("CAN 통신 이벤트 큐 생성 완료...");
 }
 
 void BootStrap::InitSerial()

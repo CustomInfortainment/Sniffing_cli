@@ -7,7 +7,7 @@
 class CThread
 {
     public:
-        virtual char* GetEventName(Event e) 
+        virtual const char* GetEventName(Event e) 
         {
             switch(e)
             {
@@ -32,31 +32,34 @@ class CThread
                     return "REBOOT_ACK";
                 case Event::REBOOT_SEND:
                     return "REBOOT_SEND";
+                default:
+                    return "none";
 
                 //--------- 여기서 부터 CAN 통신 관련 이벤트 --------------
             }
         }
-        virtual void RegisterPowerEvent(Event e) 
-        {
-            Event event = e;
-            char consolebuf[50];
 
-            if(xQueueSend(PowerEventQueue, &event, (TickType_t) 10) == pdPASS)
-            {
-                sprintf(consolebuf, "Event : %s", GetEventName(e));
-                Serial.println(consolebuf);
-            }
-        }
-        virtual void RegisterCanEvent(Event e)
-        {
-            Event event = e;
-            char consolebuf[50];
+        // virtual void RegisterPowerEvent(Event e) 
+        // {
+        //     Event event = e;
+        //     char consolebuf[50];
 
-            if(xQueueSend(CanEventQueue, &event, (TickType_t) 10) == pdPASS)
-            {
-                sprintf(consolebuf, "Event : %s", GetEventName(e));
-                Serial.println(consolebuf);
-            }
-        }
+        //     if(xQueueSend(PowerEventQueue, &event, (TickType_t) 10) == pdPASS)
+        //     {
+        //         sprintf(consolebuf, "Event : %s", GetEventName(e));
+        //         Serial.println(consolebuf);
+        //     }
+        // }
+        // virtual void RegisterCanEvent(Event e)
+        // {
+        //     Event event = e;
+        //     char consolebuf[50];
+
+        //     if(xQueueSend(CanEventQueue, &event, (TickType_t) 10) == pdPASS)
+        //     {
+        //         sprintf(consolebuf, "Event : %s", GetEventName(e));
+        //         Serial.println(consolebuf);
+        //     }
+        // }
         virtual void OnUpdate() {}
 };
