@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <termios.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -14,6 +15,9 @@
 
 #define LEONARDO_VID 0x3343
 #define LEONARDO_PID 0x803a
+
+#define CANABLE2_VID 0x16d0
+#define CANABLE2_PID 0x117e
 
 //리눅스 상의 USB 정보 경로
 #define VID_PATH "/sys/bus/usb/devices/*/idVendor"
@@ -31,18 +35,21 @@ typedef enum
 {
     INIT_OK = 0,
     SERIAL_PORT_OPEN_FAILED = -1,
-    SERIAL_PORT_OPEN_FAILED = -2,
+    SERIAL_PORT_LOAD_FAILED = -2,
     TERMINULL_LOAD_FAILED = -3,
-    TERMINULL_SAVE_FAILED = -4
-}SerialPortState;
+    TERMINULL_SAVE_FAILED = -4,
+} SerialPortState;
 
 extern SerialPortState serialportstate;
 
-char* getserialport(unsigned int pid, unsigned int vid);
+//모듈
+char* getserialport();
+int getserialportstate();
 
-int init();
-void ping();
-void senddata();
-void recvdata();
+//기능
+int startserial();
+int senddata(uint8_t data);
+uint8_t recvdata();
+int endserial();
 
 #endif
