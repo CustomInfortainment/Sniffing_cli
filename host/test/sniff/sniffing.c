@@ -5,8 +5,9 @@
 #include <termios.h>
 
 #define MAX_IDS 2048  //최대 로그 저장 카운트
+#define CAN_DATA_LENGTH 25
 
-#define LOG_PATH "/Users/choemingyu/can_logs"
+#define LOG_PATH "/Users/choemingyu/Infortainment/esp32-power-sequencer/host/test/sniff/data"
 
 typedef struct
 {
@@ -17,6 +18,25 @@ typedef struct
 
 IDFile id_files[MAX_IDS];
 int id_count = 0;
+int fd;
+
+void close_all_files()
+{
+    for(int i = 0; i < id_count; i++)
+    {
+        if(id_files[i].fp != NULL)
+        {
+            fclose(id_files[i].fp);
+        }
+    }
+}
+
+void exit_handler(int sig)
+{
+    close_all_files();
+    close(fd);
+    exit(0);
+}
 
 FILE* get_file(int id)
 {
@@ -44,32 +64,21 @@ FILE* get_file(int id)
     if(entry->fp == NULL)
     {
         perror("파일 열기 실패");
-        return NULL;
+        exit_handler(1);
     }
-    printf("새 ID 발견 : 0x%03X -> %s\n", id, entry->filename);
+    printf("ID 발견 : 0x%03X -> %s\n", id, entry->filename);
     fflush(stdout);
 
     return entry->fp;
-}
-
-void close_all_files()
-{
-    for(int i = 0; i < id_count; i++)
-    {
-        if(id_files[i].fp != NULL)
-        {
-            fclose(id_files[i].fp);
-        }
-    }
 }
 
 int main(void)
 {
     const char* port = "/dev/cu.usbmodem2056369243431";
 
-    system("mkdir -p /Users/choemingyu/can_logs");
+    system("mkdir -p /Users/choemingyu/Infortainment/esp32-power-sequencer/host/test");
 
-    int fd = open(port, O_RDWR | O_NOCTTY);
+    fd = open(port, O_RDWR | O_NOCTTY);
     if(fd < 0)
     {
         perror("포트 열기 실패");
@@ -105,6 +114,8 @@ int main(void)
     char buf;
     int size = 0;
 
+    signal(SIGINT, exit_handler);
+
     while(1)
     {
         read(fd, &buf, 1);
@@ -113,27 +124,43 @@ int main(void)
         if(size > 255)
         {
             perror("배열 인덱스 크기 초과");
-            return 1;
+            exit_handler(1);
         }
 
-        if(frame[size - 1] == '\r' && frame[0] == 't') //표준 프레임인지 확인
+        if(frame[size - 1] == '\r') //표준 프레임인지 확인
         {
-            char id_str[4] = {frame[1], frame[2], frame[3], '\0'};
-            int id = strtol(id_str, NULL, 16); //id값 16진수로 변환
-            int dlc = frame[4] - '0'; //char 변환
-            char* data = frame + 5; //데이터는 5부터 시작
-
-            FILE *fp = get_file(id);
-
-            if(fp == NULL)
+            if(frame[0] == 't')
             {
-                perror("파일 열기 실패");
-                return 1;
+                char id_str[4] = {frame[1], frame[2], frame[3], '\0'};
+                int id = strtol(id_str, NULL, 16); //id값 16진수로 변환
+                int dlc = frame[4] - '0'; //char 변환
+                char data[CAN_DATA_LENGTH]; //data크기 16 + 공백 8
+
+                for(int i = 0; i < CAN_DATA_LENGTH; i++)
+                {
+                    if((i - 2) % 3 == 0)
+                    {
+                        data[i] = ' ';
+                        continue;
+                    }
+                    data[i] = *(frame + 5 + i);
+                }
+                data[CAN_DATA_LENGTH - 1] = '\0';
+
+                FILE *fp = get_file(id);
+
+                if(fp == NULL)
+                {
+                    perror("파일 열기 실패");
+                    return 1;
+                }
+                fprintf(fp, "ID:%3X DLC:%d DATA:%s\n", id, dlc, data);
+                printf("ID:%3X DLC:%d DATA:%s\n", id, dlc, data);
+                fflush(fp);
             }
-            fprintf(fp, "ID:%3X DLC:%d DATA:%s", id, dlc, data);
-            fflush(fp);
+            size = 0;
         }
-        size = 0;
     }
+
     return 0;
 }
