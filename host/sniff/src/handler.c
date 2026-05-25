@@ -27,8 +27,6 @@ void can_dlc_str(int dlc, char* log)
 void prt_log_console(char* log)
 {
     char date_buf[MAX_LOG_LENGTH];
-
-    fflush(stdout);
     get_current_day(date_buf);
 
     printf("%s -> %s\n", date_buf, log);
@@ -43,8 +41,6 @@ void prt_log_console_handler(int id, int dlc, char* data)
     char date_log[MAX_LOG_LENGTH];
     char id_log[MAX_LOG_LENGTH];
     char dlc_log[MAX_LOG_LENGTH];
-
-    fflush(stdout);
 
     get_current_day(date_log);
 

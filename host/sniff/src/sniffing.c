@@ -1,6 +1,8 @@
 #include "sniffing.h"
 #include "handler.h"
 #include "file.h"
+#include "parser.h"
+#include "utility.h"
 
 int id_count = 0;
 int serial_fd = 0;
@@ -79,10 +81,11 @@ void do_sniffing()
             }
             frame[size++] = current_byte;
 
+            //표준 CAN 데이터만 거름. 소문자가 't'
             if(frame[0] == 't' && frame[size - 1] == '\r') 
             {
                 char id_str[4] = {frame[1], frame[2], frame[3], '\0'};
-                int id = strtol(id_str, NULL, 16);
+                int id = HEX_TO_NUM(frame[1]) << 8 | HEX_TO_NUM(frame[2]) << 4 | HEX_TO_NUM(frame[3]);
                 int dlc = frame[4] - '0';
                 char* data = frame + 5;
 
@@ -101,19 +104,6 @@ void do_sniffing()
                 format_data[dst_idx - 1] = '\0';
                 FILE* fp = get_file(id);
 
-                // if(id == DATA_RPM)
-                // {
-                //     char rpm_ch1[3] = {data[2], data[3], '\0'};
-                //     char rpm_ch2[3] = {data[4], data[5], '\0'};
-                //     int rpm_data1 = strtol(rpm_ch1, NULL, 16);
-                //     int rpm_data2 = strtol(rpm_ch2, NULL, 16);
-
-                //     int rpm_result = (rpm_data1 << 8 | rpm_data2);
-
-                //     //printf("\rrpm : %4d.   ", rpm_result / 4);
-                // }
-                // fflush(stdout);
-
                 if(fp != NULL)
                 {
                     fprintf(fp, "id:%03X DLC:%d, data:%s\n", id, dlc, format_data);
@@ -121,7 +111,6 @@ void do_sniffing()
                 }
                 size = 0;
                 frame[0] = '\0';
-                //tcflush(serial_fd, TCIFLUSH);
             }
         }
     }

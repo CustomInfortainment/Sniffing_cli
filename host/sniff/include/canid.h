@@ -5,6 +5,7 @@
 #define ID_ENGINE_RPM       0x0C9
 #define ID_VEHICLE_SPEED    0x3E9
 #define ID_WHEEL_SPEED_FRONT 0x120
+#define ID_COOLENT_TEMP     0x4C1
 
 //바디/섀시
 #define ID_STEERING_ANGLE   0x1E1
