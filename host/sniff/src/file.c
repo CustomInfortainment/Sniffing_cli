@@ -53,7 +53,7 @@ FILE* get_file(int id)
         entry->id = id;
         memset(buf, '\0', sizeof(buf));
         snprintf(buf, sizeof(buf), "%s/%s/CAN_%#05X.txt", SAVE_PATH, date_buf, id);
-        snprintf(entry->filename, sizeof(entry->filename), "CAN_%3X.txt", id);
+        snprintf(entry->filename, sizeof(entry->filename), "CAN_%#05X.txt", id);
         entry->fp = fopen(buf, "a");
 
         return entry->fp;
@@ -63,11 +63,6 @@ FILE* get_file(int id)
         return isfile;
     }
     return NULL;
-}
-
-void save_file()
-{
-    
 }
 
 void all_exit_files()

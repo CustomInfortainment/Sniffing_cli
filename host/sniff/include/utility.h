@@ -3,10 +3,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
-#define RING_BUF_SIZE 40
-#define FRAME_SIZE 40
+#include "global.h"
 
 //CHAR -> 16진수 변환
 #define HEX_TO_NUM(c) ((c) >= 'a' ? (c) - 'a' + 10 : \
@@ -18,17 +18,10 @@
 void get_current_day(char* buf);
 void get_current_time(char* buf);
 
-//링 버퍼 구현
-typedef struct
-{
-    char buf[RING_BUF_SIZE][FRAME_SIZE];
-    unsigned int head;
-    unsigned int tail;
-} RingBuffer;
-void ringbuf_init(RingBuffer* buf);
+void ringbuf_init(RingBuffer** buf);
 int ringbuf_isempty(RingBuffer* buf);
 int ringbuf_isfull(RingBuffer* buf);
-void ringbuf_register_data(RingBuffer* buf, char* frame);
-void ringbuf_get_data(RingBuffer* buf, char* outframe);
+void ringbuf_register_data(RingBuffer* buf, CANFrame* frame);
+void ringbuf_get_data(RingBuffer* buf, CANFrame* frame);
 
 #endif

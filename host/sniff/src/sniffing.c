@@ -7,12 +7,11 @@
 int id_count = 0;
 int serial_fd = 0;
 
-void all_disconnect_serialport()
-{
-    close(serial_fd);
-}
+RingBuffer* ringbuf;
 
-void do_sniffing()
+char id_str[4];
+
+void all_init()
 {
     serial_fd = open(SERIAL_PORT_PATH, O_RDWR | O_NOCTTY);
 
@@ -46,16 +45,59 @@ void do_sniffing()
     write(serial_fd, "O\r", 2);
     usleep(500000);
 
-    char frame[256];
-    int size = 0;
-    char buf[256];
-
+    //링버퍼 초기화
+    ringbuf_init(&ringbuf);
     printf("CAN 통신 시작..\n");
-
     signal(SIGINT, precess_exit_handler);
+}
+
+void all_disconnect_serialport()
+{
+    close(serial_fd);
+
+    //나중에 지웁시다...
+    free(ringbuf);
+}
+
+//수집한 데이터를 알아보기 쉽게 수정한다.
+void data_save(CANFrame* frame)
+{
+    char format_data[40];
+    FILE* fp = NULL;
+
+    int dst_idx = 0;
+    
+    for(int i = 0; i < frame->dlc; i++)
+    {
+        format_data[dst_idx] = frame->raw_data[i * 2];
+        format_data[dst_idx + 1] = frame->raw_data[i * 2 + 1];
+        format_data[dst_idx + 2] = ' ';
+
+        dst_idx += 3;
+    }
+    format_data[dst_idx - 1] = '\0';
+
+    fp = get_file(frame->id);
+
+    if(fp != NULL)
+    {
+        fprintf(fp, "id:%03X DLC:%d, data:%s\n", frame->id, frame->dlc, format_data);
+        prt_log_console_handler(frame->id, frame->dlc, format_data);
+    }
+}
+
+void data_recv()
+{
+    char buf[256];
+    char raw_frame[256];
+
+    int raw_frame_size = 0;
+
+    CANFrame frame;
 
     while(1)
     {  
+        // 256byte 만큼 읽고
         int read_bytes = read(serial_fd, buf, sizeof(buf));
 
         if (read_bytes <= 0) {
@@ -63,55 +105,64 @@ void do_sniffing()
             usleep(200000);
             continue; // 읽기 실패거나 데이터가 없으면 다시 대기
         }
-
+        
+        // 1바이트씩 불러와서 읽음.
         for(int b = 0; b < read_bytes; b++)
         {
             char current_byte = buf[b];
 
-            if (size >= 256) 
+            if (raw_frame_size >= 255) 
             {
-                size = 0; 
+                raw_frame_size = 0; 
             }
 
-            if(size == 0 && current_byte != 't')
+            if(raw_frame_size == 0 && current_byte != 't')
             {
-                frame[0] = '\0';
-                size = 0;
+                raw_frame[0] = '\0';
+                raw_frame_size = 0;
                 continue;
             }
-            frame[size++] = current_byte;
+            raw_frame[raw_frame_size++] = current_byte;
 
-            //표준 CAN 데이터만 거름. 소문자가 't'
-            if(frame[0] == 't' && frame[size - 1] == '\r') 
+            // 표준 CAN 데이터만 거름. 소문자가 't', frame 배열 완성.
+            if(raw_frame[0] == 't' && raw_frame[raw_frame_size - 1] == '\r') 
             {
-                char id_str[4] = {frame[1], frame[2], frame[3], '\0'};
-                int id = HEX_TO_NUM(frame[1]) << 8 | HEX_TO_NUM(frame[2]) << 4 | HEX_TO_NUM(frame[3]);
-                int dlc = frame[4] - '0';
-                char* data = frame + 5;
-
-                char format_data[40];
-
-                int dst_idx = 0;
+                memset(&frame, 0, sizeof(CANFrame));
                 
-                for(int i = 0; i < dlc; i++)
-                {
-                    format_data[dst_idx] = data[i * 2];
-                    format_data[dst_idx + 1] = data[i * 2 + 1];
-                    format_data[dst_idx + 2] = ' ';
+                id_str[0] = raw_frame[1];
+                id_str[1] = raw_frame[2];
+                id_str[2] = raw_frame[3];
+                id_str[3] = '\0';
 
-                    dst_idx += 3;
-                }
-                format_data[dst_idx - 1] = '\0';
-                FILE* fp = get_file(id);
+                frame.id = 
+                HEX_TO_NUM(raw_frame[1]) << 8 | 
+                HEX_TO_NUM(raw_frame[2]) << 4 | 
+                HEX_TO_NUM(raw_frame[3]);
 
-                if(fp != NULL)
-                {
-                    fprintf(fp, "id:%03X DLC:%d, data:%s\n", id, dlc, format_data);
-                    prt_log_console_handler(id, dlc, format_data);
-                }
-                size = 0;
-                frame[0] = '\0';
+                frame.dlc = raw_frame[4] - '0';
+                
+                //2byte = dlc = 1
+                memcpy(frame.raw_data, raw_frame + 5, frame.dlc * 2);
+
+                //버퍼에 저장
+                ringbuf_register_data(ringbuf, &frame);
+
+                //파싱한 데이터 출력
+                prt_parsing_to_console(frame.id, frame.raw_data);
+
+                raw_frame_size = 0;
+                raw_frame[0] = '\0';
             }
+        }
+        
+        //버퍼 데이터 비움
+        while(ringbuf_isempty(ringbuf) == 0)
+        {
+            char ringbuf_frame[256];
+            CANFrame frame_buf;
+
+            ringbuf_get_data(ringbuf, &frame_buf);
+            data_save(&frame_buf);
         }
     }
 }

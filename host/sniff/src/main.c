@@ -3,11 +3,12 @@
 #include "sniffing.h"
 #include "utility.h"
 
-RingBuffer* ringbuf;
-
 int main(void)
 {
-    ringbuf_init(&ringbuf);
-    do_sniffing();
+    //데이터 수집 시작
+    printf("\033[2J");
+    all_init();
+    data_recv();
+
     return 0;
 }

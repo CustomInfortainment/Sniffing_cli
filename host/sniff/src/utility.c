@@ -1,5 +1,6 @@
 #include "utility.h"
 #include "handler.h"
+#include "sniffing.h"
 
 //-------- 오늘 날짜 출력 ----------
 void get_current_day(char* buf)
@@ -17,23 +18,25 @@ void get_current_day(char* buf)
 void get_current_time(char* buf)
 {
     time_t t = time(NULL);
-    struct tm t = *localtime(&t);
+    struct tm tm = *localtime(&t);
 }
 
 //--------- 링버퍼 구현부 -----------
 
-void ringbuf_init(RingBuffer* ringbuf)
+void ringbuf_init(RingBuffer** ringbuf)
 {
     char log[256];
 
     snprintf(log, sizeof(log), "링버퍼 초기화 중...");
     prt_log_console(log);
 
-    if(ringbuf != NULL)
+    *ringbuf = malloc(sizeof(RingBuffer));
+
+    if(*ringbuf != NULL)
     {
-        ringbuf->head = 0;
-        ringbuf->tail = 0;
-        memset(ringbuf->buf, 0, sizeof(ringbuf->buf));
+        (*ringbuf)->head = 0;
+        (*ringbuf)->tail = 0;
+        memset((*ringbuf)->buf, 0, sizeof((*ringbuf)->buf));
 
         snprintf(log, sizeof(log), "링버퍼 초기화 완료");
         prt_log_console(log);
@@ -58,17 +61,19 @@ int ringbuf_isfull(RingBuffer* ringbuf)
     return 0;
 }
 
-void ringbuf_register_data(RingBuffer* ringbuf, char* frame)
+//버퍼에 저장
+void ringbuf_register_data(RingBuffer* ringbuf, CANFrame* frame)
 {
     if(ringbuf_isfull(ringbuf) == 1) //오버플로우 상태라면
     {
         return;
     }
-    snprintf(ringbuf->buf[ringbuf->head], RING_BUF_SIZE, "%s", frame);
+    memcpy(&ringbuf->buf[ringbuf->head], frame, sizeof(CANFrame));
     ringbuf->head = (ringbuf->head + 1) % RING_BUF_SIZE;
 }
 
-void ringbuf_get_data(RingBuffer* ringbuf, char* outframe)
+//버퍼에서 가져옴 -> outframe
+void ringbuf_get_data(RingBuffer* ringbuf, CANFrame* outframe)
 {
     if(ringbuf_isempty(ringbuf) == 1) //언더플로우 상태라면
     {
@@ -77,6 +82,5 @@ void ringbuf_get_data(RingBuffer* ringbuf, char* outframe)
     int idx = ringbuf->tail;
     ringbuf->tail = (ringbuf->tail + 1) % RING_BUF_SIZE;
 
-    snprintf(outframe, FRAME_SIZE, "%s", ringbuf->buf[idx]);
+    memcpy(outframe, &ringbuf->buf[idx], sizeof(CANFrame));
 }
-

@@ -25,7 +25,8 @@ int get_coolent_data(int id, char* data)
         return -1;
     }
 
-    int coolent_hex = (HEX_TO_NUM(data[2]) << 4) | HEX_TO_NUM(data[3]);
+    int coolent_hex = (HEX_TO_NUM(data[4]) << 4) | HEX_TO_NUM(data[5]);
 
     return coolent_hex - 40;
 }
+

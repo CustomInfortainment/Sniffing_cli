@@ -1,4 +1,0 @@
-id:4C5 DLC:5, data:00 00 00 00 00
-id:4C5 DLC:5, data:00 00 00 00 00
-id:4C5 DLC:5, data:00 00 00 00 00
-id:4C5 DLC:5, data:00 00 00 00 00
