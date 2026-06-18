@@ -1,6 +1,7 @@
 # Sniffing_cli
 
 차량 CAN 버스 데이터를 수집하는 CLI 툴
+(Canable 2.0 모듈이 필요합니다!)
 
 ---
 
