@@ -1,6 +1,64 @@
-## License
-This project is licensed under the MIT License.
+# Sniffing_cli
 
-## Third-party Libraries
-- HardwareSerial - LGPL v2.1 (Espressif arduino-esp32)
-- TWAI Driver - Apache 2.0 (Espressif ESP-IDF)
+차량 CAN 버스 데이터를 수집하는 CLI 툴
+
+---
+
+## 개요
+
+차량 인포테인먼트 시스템 개발 과정에서 CAN 데이터 스니핑 코드의 테스트 편의성을 높이기 위해 제작되었습니다.  
+빌드 후 옵션을 통해 데이터 저장, 출력 등을 유연하게 제어할 수 있습니다.
+
+---
+
+## 개발 환경
+
+- **OS**: Linux (Arch Linux)
+- **언어**: C
+- **하드웨어**: CAN-Serial 변환 모듈
+
+---
+
+## 사용법
+
+```bash
+sniffer -p              # 터미널에 데이터 출력
+sniffer -s              # 파일로 데이터 저장
+sniffer -f [CAN ID]     # 특정 CAN ID 필터링
+sniffer -s -p           # 저장 + 출력 동시에
+sniffer -f 0x123 -s -p  # 필터링 + 저장 + 출력
+```
+
+---
+
+## 옵션
+
+| 옵션 | 설명 |
+|------|------|
+| `-p` | 수집 중인 데이터를 표준출력으로 출력 |
+| `-s` | 수집한 데이터를 파일로 저장 |
+| `-f` | 특정 CAN ID만 필터링 |
+
+---
+
+## 빌드 방법
+
+```bash
+make
+```
+
+---
+
+## 프로젝트 배경
+
+원래 차량 인포테인먼트 시스템 개발의 일부로 시작되었으나, 스니핑 코드 테스트 시 매번 코드를 수정해야 하는 불편함이 있어 CLI 툴로 분리하였습니다.
+
+### 기존 문제점
+
+- 데이터 저장 여부, 출력 여부를 변경하려면 코드 주석 처리 후 재빌드 필요
+- Qt UI 없이 독립적인 테스트가 어려움
+
+### 해결 방향
+
+- CLI 옵션으로 동작을 유연하게 제어
+- 스니핑 코드를 Qt UI와 완전히 분리하여 독립적으로 테스트 가능
