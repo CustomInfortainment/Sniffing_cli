@@ -13,7 +13,7 @@
 
 ## 개발 환경
 
-- **OS**: Linux (Arch Linux)
+- **OS**: Linux
 - **언어**: C
 - **하드웨어**: CAN-Serial 변환 모듈
 
