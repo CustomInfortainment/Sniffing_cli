@@ -8,7 +8,7 @@
 
 #include "global.h"
 
-//CHAR -> 16진수 변환
+//16진수 -> 10진수로 변환
 #define HEX_TO_NUM(c) ((c) >= 'a' ? (c) - 'a' + 10 : \
                     (c) >= 'A' ? (c) - 'A' + 10 : \
                     (c) - '0')
