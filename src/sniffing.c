@@ -1,5 +1,5 @@
 #include "sniffing.h"
-#include "handler.h"
+#include "log.h"
 #include "file.h"
 #include "parser.h"
 #include "utility.h"
