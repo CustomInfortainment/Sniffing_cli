@@ -2,13 +2,10 @@
 #include "file.h"
 #include "sniffing.h"
 #include "utility.h"
+#include "terminal.h"
 
 int main(void)
 {
-    //데이터 수집 시작
-    printf("\033[2J");
-    all_init();
-    data_recv();
-
+    run_terminal();
     return 0;
 }

@@ -32,7 +32,7 @@ FILE* get_file(int id)
 
     char buf[256];
     char date_buf[256];
-    get_current_day(date_buf);
+    get_current_time(date_buf);
 
     //저장할 디렉터리 및 파일이 있는지 확인
     isdir = check_dir(date_buf);

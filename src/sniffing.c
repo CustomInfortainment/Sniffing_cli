@@ -59,7 +59,7 @@ void all_disconnect_serialport()
     free(ringbuf);
 }
 
-//수집한 데이터를 알아보기 쉽게 수정한다.
+//수집한 데이터를 알아보기 쉽게 수정하고, 파일에 쓰기.
 void data_save(CANFrame* frame)
 {
     char format_data[40];
@@ -155,7 +155,7 @@ void data_recv()
             }
         }
         
-        //버퍼 데이터 비움
+        //버퍼 데이터 비움, 이때 파일쓰기.
         while(ringbuf_isempty(ringbuf) == 0)
         {
             char ringbuf_frame[256];

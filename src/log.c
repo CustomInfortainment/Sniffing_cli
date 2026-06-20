@@ -30,7 +30,7 @@ void can_dlc_str(int dlc, char* log)
 void prt_log_console(char* log)
 {
     char date_buf[MAX_LOG_LENGTH];
-    get_current_day(date_buf);
+    get_current_time(date_buf);
 
     printf("%s -> %s\n", date_buf, log);
 }
@@ -45,7 +45,7 @@ void prt_log_console_handler(int id, int dlc, char* data)
     char id_log[MAX_LOG_LENGTH];
     char dlc_log[MAX_LOG_LENGTH];
 
-    get_current_day(date_log);
+    get_current_time(date_log);
 
     can_id_str(id, data, id_log);
     can_dlc_str(dlc, dlc_log);
@@ -62,7 +62,7 @@ void prt_parsing_to_console(int id, char* data)
     char data_log[MAX_LOG_LENGTH];
 
     can_id_str(id, data, data_log);
-    get_current_day(date_log);
+    get_current_time(date_log);
 
     snprintf(buf, MAX_LOG_LENGTH, "%s -> %s\n", date_log, data_log);
 

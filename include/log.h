@@ -1,9 +1,10 @@
-#ifndef HANDLER_H
-#define HANDLER_H
+#ifndef LOG_H
+#define LOG_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <signal.h>
 
 #define MAX_LOG_LENGTH 256
 
