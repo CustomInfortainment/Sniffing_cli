@@ -1,73 +1,142 @@
 #include "terminal.h"
 
-int input_from_user(char *buf1, char* buf2, CMDFrame* frame)
+enum CLI_MODE currentmode;
+
+struct termios old_settings;
+struct termios new_settings;
+
+void set_cli_mode(enum CLI_MODE mode)
 {
-    if(fgets(buf1, MAX_CMD_LINE, stdin) == NULL)
-    {
-        prt_log_console("명령을 다시 입력해주세요.");
-        return 0;
-    }
-    else
-    {
-        frame = (CMDFrame*)malloc(sizeof(CMDFrame));
-        if(frame == NULL)
-        {
-            prt_log_console("CMD 구조체 메모리 할당 실패");
-            return 0;
-        }
-        else
-        {
-            
-        }
-    }
-    return 1;
+	currentmode = mode;
 }
 
-void get_cmd()
+void run_cli_mode(enum CLI_MODE mode)
 {
-    char buf1[MAX_CMD_LINE];
-    char buf2[MAX_CMD_LINE];
+	switch(currentmode)
+	{
+		case NORMAL:
+			handler_normal_mode();
+			break;
+		case CMD:
+			handler_cmd_mode();
+			break;
+		default:
+			break;
+	}
+}
 
-    CMDFrame* cmdFrame;
+void prt_prompt()
+{
+	printf("%s", PROMPT);
+}
 
-    while(1)
+//논블로킹 입력 구현
+void set_keypress()
+{
+	tcgetattr(STDIN_FILENO, &old_settings);
+	tcgetattr(STDIN_FILENO, &new_settings);
+
+	new_settings.c_lflag &= ~(ICANON | ECHO);
+	new_settings.c_cc[VMIN] = 0;
+	new_settings.c_cc[VTIME] = 0;
+
+	tcsetattr(STDIN_FILENO, TCSANOW, &new_settings);
+
+	//커맨드 모드로 전환
+	set_cli_mode(CMD);
+}
+
+//논블로킹 -> 기존 터미널 설정으로 복귀
+void restore_keypress()
+{
+	tcsetattr(STDIN_FILENO, TCSANOW, &old_settings);
+
+	//노말 모드로 전환
+	set_cli_mode(NORMAL);
+}
+
+//사용자로부터 명령어와 canid를 받는다, CMD모드에서만 작동
+void get_cmd(char *buf, CMDFrame* frame)
+{
+	if(frame == NULL)
+	{
+		prt_log_console("메모리 미할당 오류");
+		return;
+	}
+	if(fgets(buf, MAX_CMD_LINE, stdin) == NULL)
+	{
+		return;
+	}
+
+	//명령, 인자
+	char* cmd1 = strtok(buf, " \n");
+	char* cmd2 = strtok(NULL, " \n");
+
+	strcpy(frame->cmd, cmd1);
+
+	if(cmd2 != NULL)
+	{
+		char* hex_data = cmd2;
+
+		//0x, 0X 부분은 제외
+		if(cmd2[0] == '0' && (cmd2[1] == 'x' || cmd2[1] == 'X'))
+		{
+			hex_data += 2;
+		}
+
+		frame->id = 
+			HEX_TO_NUM(hex_data[0]) << 8 |
+			HEX_TO_NUM(hex_data[1]) << 4 |
+			HEX_TO_NUM(hex_data[2]);
+	}
+}
+
+void check_cmd()
+{
+    char buf[MAX_CMD_LINE];
+
+    CMDFrame* cmdFrame = (CMDFrame*)malloc(sizeof(CMDFrame));
+
+	if(cmdFrame == NULL)
+	{
+		prt_log_console("메모리 미할당 오류");
+		return;
+	}
+
+	//커맨드 모드일 때.
+    while(currentmode == CMD)
     {
-        int input = input_from_user(buf1, buf2, &cmdFrame);
+		//프레임 값 할당
+        get_cmd(buf, &cmdFrame);
 
-        if(input == 0)
-        {
-            continue;
-        }
-        else
-        {
-            if(strcmp(buf1, CMD_PRT) == 0)
-            {
-                prt_log_console("명령을 출력 하시겠나요?(y/n)");
-            }
-            else if(strcmp(buf1, CMD_FILTER) == 0)
-            {
-
-            }
-            else if(strcmp(buf1, CMD_MASK) == 0)
-            {
-
-            }
-            else if(strcmp(buf1, CMD_SAVE) == 0)
-            {
-
-            }
-            else if(strcmp(buf1, CMD_UNFILTER) == 0)
-            {
-
-            }
-            else if(strcmp(buf1, CMD_UNMASK) == 0)
-            {
-
-            }
-            else
-            {
-                prt_log_console("해당 명령은 존재하지 않습니다.");
-            }
-        }
+		if(strcmp(cmdFrame->cmd, CMD_PRT) == 0)
+		{
+		}
+		else if(strcmp(cmdFrame->cmd, CMD_SAVE) == 0)
+		{
+		}
+		else if(strcmp(cmdFrame->cmd, CMD_FILTER) == 0)
+		{
+		}
+		else if(strcmp(cmdFrame->cmd, CMD_UNFILTER) == 0)
+		{
+		}
+		else if(strcmp(cmdFrame->cmd, CMD_MASK) == 0)
+		{
+		}
+		else if(strcmp(cmdFrame->cmd, CMD_UNMASK) == 0)
+		{
+		}
+		else
+		{
+			prt_log_console("명령이 존재하지 않습니다.");
+			continue;
+		}
     }
+}
+
+void run_terminal()
+{
+	set_cli_mode(NORMAL);
+	check_cmd();
 }

@@ -41,8 +41,8 @@ typedef struct
 //CLI툴 명령 구조체
 typedef struct
 {
-    char* cmd;
-    char* can_id;
+    char cmd[256];
+    int id;
 } CMDFrame;
 
 #endif

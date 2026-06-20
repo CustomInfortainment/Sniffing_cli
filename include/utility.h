@@ -8,16 +8,16 @@
 
 #include "global.h"
 
-//16진수 -> 10진수로 변환
+//char -> 16진수 변환
 #define HEX_TO_NUM(c) ((c) >= 'a' ? (c) - 'a' + 10 : \
                     (c) >= 'A' ? (c) - 'A' + 10 : \
                     (c) - '0')
                     
 
 //현재 날짜 출력
-void get_current_day(char* buf);
 void get_current_time(char* buf);
 
+//링버퍼 구현
 void ringbuf_init(RingBuffer** buf);
 int ringbuf_isempty(RingBuffer* buf);
 int ringbuf_isfull(RingBuffer* buf);

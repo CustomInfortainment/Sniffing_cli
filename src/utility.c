@@ -3,22 +3,15 @@
 #include "sniffing.h"
 
 //-------- 오늘 날짜 출력 ----------
-void get_current_day(char* buf)
-{
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-
-    snprintf(buf, sizeof(tm), "%d-%d-%d", 
-    tm.tm_year+1900, 
-    tm.tm_mon+1, 
-    tm.tm_mday);
-}
-
-//-------- 현재 시간 출력 -----------
 void get_current_time(char* buf)
 {
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
+
+    snprintf(buf, sizeof(tm), "%d:%d;%d", 
+    tm.tm_hour, 
+    tm.tm_min, 
+    tm.tm_sec);
 }
 
 //--------- 링버퍼 구현부 -----------

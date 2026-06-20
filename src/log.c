@@ -75,16 +75,6 @@ void prt_parsing_to_console(int id, char* data)
 
     current_rpm = get_rpm_data(id, data);
     current_temp = get_coolent_data(id, data);
-
-    printf("\033[H");
-
-    printf("==========================================\n");
-    printf("   [AVEO 1.4T] REALTIME VEHICLE MONITOR   \n");
-    printf("==========================================\n");
-    printf("  🏎️  ENGINE RPM  :  %d RPM\n", current_rpm);
-
-    if(current_temp >= 0)
-        printf("  🌡️  COOLANT TEMP:  %d °C\n", current_temp);
 }
 
 void precess_exit_handler(int sig)
