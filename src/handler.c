@@ -1,5 +1,6 @@
 #include "handler.h"
 
+//-------------터미널 입력 관련 핸들러 구현부-------------
 //명령 입력 받음
 void handler_cmd_mode(CMDFrame** frame)
 {
@@ -58,4 +59,64 @@ void handler_running_mode()
 	//커맨드 모드로 전환 및 따옴표 입력 받으면 전환
 	if(n > 0 && cmd == ':')
 		set_cli_mode(CMD);
+}
+
+//---------------------각 명령어 핸들러 구현----------------
+
+void handler_cmd_prt(CMDFrame* frame)
+{
+    if(strcmp(frame->id, CMD_PRT) != 0)
+    {
+        prt_log_console("명령이 유효하지 않습니다.");
+        return;
+    }
+}
+
+void handler_cmd_save(CMDFrame* frame)
+{
+    if(strcmp(frame->id, CMD_SAVE) != 0)
+    {
+        prt_log_console("명령이 유효하지 않습니다.");
+        return;
+    }
+}
+
+void handler_cmd_filter(CMDFrame* frame)
+{
+    if(strcmp(frame->id, CMD_FILTER) != 0 || frame->id == 0)
+    {
+        prt_log_console("명령이 유효하지 않습니다.");
+        return;
+    }
+}
+
+void handler_cmd_unfilter(CMDFrame* frame)
+{
+    if(strcmp(frame->id, CMD_UNFILTER) != 0)
+    {
+        prt_log_console("명령이 유효하지 않습니다.");
+        return;
+    }
+    if(frame->id != 0)
+    {
+
+    }
+}
+
+void handler_cmd_mask(CMDFrame* frame)
+{
+    if(strcmp(frame->id, CMD_MASK) != 0)
+    {
+        prt_log_console("명령이 유효하지 않습니다.");
+        return;
+    }
+}
+
+void handler_cmd_unmask(CMDFrame* frame)
+{
+    if(strcmp(frame->id, CMD_UNMASK) != 0)
+    {
+        prt_log_console("명령이 유효하지 않습니다.");
+        return;
+    }
 }

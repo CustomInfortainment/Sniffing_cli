@@ -17,11 +17,17 @@
 //현재 날짜 출력
 void get_current_time(char* buf);
 
-//링버퍼 구현
+//링버퍼 구현부
 void ringbuf_init(RingBuffer** buf);
 int ringbuf_isempty(RingBuffer* buf);
 int ringbuf_isfull(RingBuffer* buf);
 void ringbuf_register_data(RingBuffer* buf, CANFrame* frame);
 void ringbuf_get_data(RingBuffer* buf, CANFrame* frame);
+
+//연결리스트 구현부
+void list_init(ListNode** list);
+void list_addnode(ListNode** list, ListNode** tail, int id);
+void list_deletenode(ListNode** list, ListNode** tail, int id);
+void list_clear(ListNode** list);
 
 #endif

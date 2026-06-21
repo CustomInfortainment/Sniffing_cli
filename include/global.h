@@ -4,6 +4,8 @@
 #include <fcntl.h>
 #include <stdio.h>
 
+#include "log.h"
+
 #define RING_BUF_SIZE 40
 
 //명령어 모음
@@ -30,7 +32,7 @@ typedef struct
     char raw_data[256];
 } CANFrame;
 
-//버퍼 구조체
+//링버퍼 구조체
 typedef struct
 {
     CANFrame* buf[RING_BUF_SIZE];
@@ -42,7 +44,15 @@ typedef struct
 typedef struct
 {
     char cmd[256];
-    int id;
+    int id; 
 } CMDFrame;
+
+//리스트 노드 구조체, Mask, Filter 둘다 같은 거 사용
+typedef struct
+{
+    int id;
+    struct ListNode *prev;
+    struct ListNode *next;
+} ListNode;
 
 #endif

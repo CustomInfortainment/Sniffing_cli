@@ -65,7 +65,7 @@ void ringbuf_register_data(RingBuffer* ringbuf, CANFrame* frame)
     ringbuf->head = (ringbuf->head + 1) % RING_BUF_SIZE;
 }
 
-//버퍼에서 가져옴 -> outframe
+//버퍼 -> outframe
 void ringbuf_get_data(RingBuffer* ringbuf, CANFrame* outframe)
 {
     if(ringbuf_isempty(ringbuf) == 1) //언더플로우 상태라면
@@ -76,4 +76,64 @@ void ringbuf_get_data(RingBuffer* ringbuf, CANFrame* outframe)
     ringbuf->tail = (ringbuf->tail + 1) % RING_BUF_SIZE;
 
     memcpy(outframe, &ringbuf->buf[idx], sizeof(CANFrame));
+}
+
+//연결리스트 구현부
+void list_init(ListNode** head)
+{
+    *head = NULL;
+}
+
+void list_addnode(ListNode** head, ListNode** tail, int id)
+{
+    ListNode *node = (ListNode*)malloc(sizeof(ListNode));
+
+    if(node == NULL)
+        return;
+
+    node->id = id;
+    node->prev = NULL;
+    node->next = NULL;
+    
+    if(*head == NULL)
+    {
+        *tail = node;
+        *head = node;
+    }
+    else
+    {
+        node->prev = *tail;
+        (*tail)->next = node;
+        *tail = node;
+    }
+}
+
+void list_deletenode(ListNode** head, ListNode** tail, int id)
+{
+    ListNode *curnode;
+    curnode = *head;
+
+    if((*head)->id == id)
+    {
+        free(*head);
+    }
+
+    while(curnode != NULL)
+    {
+        if(curnode->id == id)
+        {
+            if(curnode->next != NULL)
+            {
+                *tail = curnode->prev;
+                curnode->prev = curnode->next;
+            }
+            free(curnode);
+            return;
+        }
+        curnode = curnode->next;
+    }
+}
+
+void list_clear(ListNode** head)
+{
 }

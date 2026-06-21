@@ -21,9 +21,9 @@ void can_id_str(int id, char* data, char* outlog)
     }
 }
 
-void can_dlc_str(int dlc, char* log)
+void can_dlc_str(int dlc, char* outlog)
 {
-    snprintf(log, MAX_LOG_LENGTH, "%d", dlc);
+    snprintf(outlog, MAX_LOG_LENGTH, "%d", dlc);
 }
 
 //단순 로그 출력1
@@ -49,9 +49,6 @@ void prt_log_console_handler(int id, int dlc, char* data)
 
     can_id_str(id, data, id_log);
     can_dlc_str(dlc, dlc_log);
-
-    //snprintf(buf, MAX_LOG_LENGTH, "%s -> id:%s dlc: %s data:%s\n", date_log, id_log, dlc_log, data);
-    //printf("\r%s", buf);
 }
 
 //파싱된 데이터 출력용
