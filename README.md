@@ -37,24 +37,35 @@ RUNNING -> COMMAND : 명령어 'q' 혹은 "quit" 를 입력한다.
 |------|-----|-----|
 | filter [id] | COMMAND | 원하는 ID만 출력 및 저장할 수 있습니다. |
 | mask [id] | COMMAND | 해당 ID를 제외한 모든 ID를 출력합니다. |
-| unfilter | COMMAND | 필터링으로 지정한 ID를 모두 초기화 합니다. (ID와 같이 입력시 특정 ID만 필터링 해제도 가능합니다.)
-| unmask | COMMAND | 마스크로 지정한 ID를 모두 초기화 합니다. (ID와 같이 입력시 특정 ID만 마스크 해제도 가능합니다.)
-| run | COMMAND | RUNNING 모드로 전환합니다. (CAN통신을 시작합니다.)
-| quilt | RUNNING | COMMAND 모드로 전환합니다. (CAN통신을 중지합니다.)
+| unfilter | COMMAND | 필터링으로 지정한 ID를 모두 초기화 합니다. (ID와 같이 입력시 특정 ID만 필터링 해제도 가능합니다.) |
+| unmask | COMMAND | 마스크로 지정한 ID를 모두 초기화 합니다. (ID와 같이 입력시 특정 ID만 마스크 해제도 가능합니다.) |
+| setmodule | COMMAND | CAN통신 모듈을 찾습니다. VID기준으로 시리얼 포트 장치를 자동으로 찾게 되어 있으나, 못찾으면 사용자가 직접 입력해야 합니다. |
+| setpath | COMMAND | 수집한 데이터를 어디에 저장할지 경로를 지정합니다. |
+| run | COMMAND | RUNNING 모드로 전환합니다. (CAN통신을 시작합니다.) |
+| quilt | RUNNING | COMMAND 모드로 전환합니다. (CAN통신을 중지합니다.) |
 
 ## 명령 옵션
-⚠️ 본 옵션은 run 명령 실행 시 인자로 들어갑니다.
+
+### run 명령 옵션
 
 | 명령어 | 설명 |
 |------|-----|
 | -s | 수집한 데이터를 저장합니다. |
 | -p | 수집한 데이터를 실시간으로 출력합니다. |
 
+### filter, mask 명령 옵션
+
+| 명령어 | 설명 |
+|------|-----|
+| -l | 마스크 및 필터링된 ID리스트를 모두 출력합니다. |
+
 ### 명령어 활용 예시
 
 ```bash
 
-sniffer > filter 0x1C9
+sniffer > filter 0x0C9
+sniffer > setmodule /dev/tty3223 #해당 시리얼 포트 이름은 예시입니다.
+sniffer > setpath ~/recv_data #
 sniffer > run -s -p
 
 RUNNING 모드로 전환...
@@ -90,15 +101,6 @@ sh # ./build/main.out
 ```
 
 ---
-
-## 프로젝트 배경
-
-원래 차량 인포테인먼트 시스템 개발의 일부로 시작되었으나, 스니핑 코드 테스트 시 매번 코드를 수정해야 하는 불편함이 있어 CLI 툴로 분리하였습니다.
-
-### 기존 문제점
-
-- 데이터 저장 여부, 출력 여부를 변경하려면 코드 주석 처리 후 재빌드 필요
-- 수많은 데이터 파싱 시 매번 코드를 수정해야 하는 번거로움 존재
 
 ### 해결 방향
 
