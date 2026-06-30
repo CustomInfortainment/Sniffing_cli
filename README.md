@@ -15,7 +15,7 @@
 
 - **OS**: Mac OS 터미널 환경
 - **언어**: C
-- **하드웨어**: CAN-Serial 변환 모듈
+- **하드웨어**: CAN-Serial 변환 모듈 (Canable 2.0 활용)
 
 ---
 
