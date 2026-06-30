@@ -82,6 +82,13 @@ sniffer >
 sh # source build.sh
 ```
 
+셸스크립트 실행이 모두 끝나면, build 폴더가 생성됩니다.
+이 후 실행할때는...
+
+```bash
+sh # ./build/main.out
+```
+
 ---
 
 ## 프로젝트 배경
